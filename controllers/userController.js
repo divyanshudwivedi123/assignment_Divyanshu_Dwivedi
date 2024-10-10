@@ -1,29 +1,25 @@
 const User = require('../models/User');
 const Admin = require('../models/Admin');
+const types = require('../types');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Assignment = require('../models/Assignment');
 
 exports.registerUser = async (req, res) => {
+    
+    const body = req.body;
+    const validation = types.userCheck.safeParse(body);
+    if(!validation.success){
+        if(validation.error.errors[0].message === "Required"){
+            return res.status(400).json({
+                message: 'Enter all the fields !'
+            })
+        }
+        return res.status(400).json({
+            message: validation.error.errors[0].message
+        })
+    }
     const { username, password } = req.body;
-
-    // Validation checks for missing username or password
-    if (!username) {
-        return res.status(400).json({ message: 'Please provide a username' });
-    }
-
-    if (!password) {
-        return res.status(400).json({ message: 'Please provide a password' });
-    }
-
-    // Check length constraints
-    if (username.length < 6) {
-        return res.status(400).json({ message: 'Username must be at least 6 characters long' });
-    }
-
-    if (password.length < 6) {
-        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
-    }
 
     try {
         // Check if the username already exists
@@ -46,24 +42,21 @@ exports.registerUser = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
+
+    const body = req.body;
+    const validation = types.userCheck.safeParse(body);
+    if(!validation.success){
+        if(validation.error.errors[0].message === "Required"){
+            return res.status(400).json({
+                message: 'Enter all the fields !'
+            })
+        }
+        return res.status(400).json({
+            message: validation.error.errors[0].message
+        })
+    }
+
     const { username, password } = req.body;
-
-    // Check if both username and password are provided
-    if (!username) {
-        return res.status(400).json({ message: 'Please provide a username' });
-    }
-    if (!password) {
-        return res.status(400).json({ message: 'Please provide a password' });
-    }
-
-    // Check if username and password meet length constraints
-    if (username.length < 6) {
-        return res.status(400).json({ message: 'Username must be at least 6 characters long' });
-    }
-
-    if (password.length < 6) {
-        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
-    }
 
     try {
         // Find the user in the database
@@ -101,17 +94,20 @@ exports.uploadAssignment = async (req, res) => {
         return res.status(403).json({ message: 'Admins are not allowed to upload assignments' });
     }
 
+    const body = req.body;
+    const validation = types.uploadAssignmentCheck.safeParse(body);
+    if(!validation.success){
+        if(validation.error.errors[0].message === "Required"){
+            return res.status(400).json({
+                message: 'Enter all the fields !'
+            })
+        }
+        return res.status(400).json({
+            message: validation.error.errors[0].message
+        })
+    }
     // If not an admin, proceed to handle the assignment upload
     const { task, admin } = req.body;  
-
-    // Check if task and admin are provided
-    if (!task) {
-        return res.status(400).json({ message: 'Please provide task.' });
-    }
-
-    if (!admin) {
-        return res.status(400).json({ message: 'Please provide admin.' });
-    }
 
     try {
         // Search for admin in database

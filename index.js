@@ -13,6 +13,14 @@ connectDB();
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).json({
+        message: 'Internal Server Error'
+    });
+});
+
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {

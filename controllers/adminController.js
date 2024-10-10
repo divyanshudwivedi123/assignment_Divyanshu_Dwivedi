@@ -1,33 +1,25 @@
 const Admin = require('../models/Admin');
 const Assignment = require('../models/Assignment');
+const types = require('../types');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.registerAdmin = async (req, res) => {
+
+    const body = req.body;
+    const validation = types.adminRegisterCheck.safeParse(body);
+    if(!validation.success){
+        if(validation.error.errors[0].message === "Required"){
+            return res.status(400).json({
+                message: 'Enter all the fields !'
+            })
+        }
+        return res.status(400).json({
+            message: validation.error.errors[0].message
+        })
+    }
+
     const { username, password, secret } = req.body;
-
-    // Check if the username is provided
-    if (!username) {
-        return res.status(400).json({ message: 'Please provide a username' });
-    }
-
-    // Check if the password is provided
-    if (!password) {
-        return res.status(400).json({ message: 'Please provide a password' });
-    }
-
-    // Check if the secret is provided
-    if (!secret) {
-        return res.status(400).json({ message: 'Please provide the secret string' });
-    }
-
-    // check username and password length
-    if (username.length < 6) {
-        return res.status(400).json({ message: 'Username must be at least 6 characters long' });
-    }
-    if (password.length < 6) {
-        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
-    }
 
     // Check if thw secret matches
     if (secret != process.env.ADMIN_SECRET) {
@@ -56,26 +48,20 @@ exports.registerAdmin = async (req, res) => {
 };
 
 exports.loginAdmin = async (req, res) => {
+
+    const body = req.body;
+    const validation = types.adminLoginCheck.safeParse(body);
+    if(!validation.success){
+        if(validation.error.errors[0].message === "Required"){
+            return res.status(400).json({
+                message: 'Enter all the fields !'
+            })
+        }
+        return res.status(400).json({
+            message: validation.error.errors[0].message
+        })
+    }
     const { username, password } = req.body;
-
-    // Check if username is provided
-    if (!username) {
-        return res.status(400).json({ message: 'Please provide a username' });
-    }
-
-    // Check if password is provided
-    if (!password) {
-        return res.status(400).json({ message: 'Please provide a password' });
-    }
-
-    // Check the length of username and password
-    if (username.length < 6) {
-        return res.status(400).json({ message: 'Username must be at least 6 characters long' });
-    }
-
-    if (password.length < 6) {
-        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
-    }
 
     try {
         // Find the admin by username
@@ -132,7 +118,14 @@ exports.getAssignments = async (req, res) => {
 };
 
 exports.acceptAssignment = async (req, res) => {
-    const { id } = req.params;
+
+    const {id} = req.params;
+    const validation = types.assignmentIdCheck.safeParse(id);
+    if(!validation.success){
+        return res.status(400).json({
+            message: validation.error.errors[0].message
+        })
+    }
 
     // Check if the requester is an admin
     if (!req.admin) {
@@ -166,7 +159,14 @@ exports.acceptAssignment = async (req, res) => {
 
 
 exports.rejectAssignment = async (req, res) => {
-    const { id } = req.params;
+
+    const {id} = req.params;
+    const validation = types.assignmentIdCheck.safeParse(id);
+    if(!validation.success){
+        return res.status(400).json({
+            message: validation.error.errors[0].message
+        })
+    }
 
     // Check if the requester is an admin
     if (!req.admin) {
