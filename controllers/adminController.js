@@ -101,7 +101,7 @@ exports.loginAdmin = async (req, res) => {
             secure: false
         });
 
-        res.status(200).json({ message: 'Login successful', token });
+        res.status(200).json({ message: 'Login successful'});
     } catch (error) {
         console.error("Error logging in admin:", error);
         res.status(500).json({ message: 'Internal server error' });
@@ -142,22 +142,28 @@ exports.acceptAssignment = async (req, res) => {
     try {
         // Find the assignment by ID
         const assignment = await Assignment.findById(id);
-        
+
         // Check if the assignment exists
         if (!assignment) {
             return res.status(404).json({ message: 'Assignment not found.' });
         }
 
+        // Check if the logged-in admin is the one assigned to this assignment
+        if (assignment.adminId !== req.admin._id.toString()) {
+            return res.status(403).json({ message: 'You are not authorized to accept this assignment.' });
+        }
+
         // Update the assignment status to 'accepted'
-        await Assignment.findByIdAndUpdate(id, { status: 'Accepted' });
+        await Assignment.findByIdAndUpdate(id, { status: 'accepted' });
 
         // Respond with a success message
-        res.status(200).json({ message: 'Assignment accepted' });
+        res.status(200).json({ message: 'Assignment accepted.' });
     } catch (error) {
         console.error('Error accepting assignment:', error);
         res.status(500).json({ message: 'Failed to accept assignment. Please try again later.' });
     }
 };
+
 
 exports.rejectAssignment = async (req, res) => {
     const { id } = req.params;
@@ -170,19 +176,25 @@ exports.rejectAssignment = async (req, res) => {
     try {
         // Find the assignment by ID
         const assignment = await Assignment.findById(id);
-        
+
         // Check if the assignment exists
         if (!assignment) {
             return res.status(404).json({ message: 'Assignment not found.' });
         }
 
+        // Check if the logged-in admin is the one assigned to this assignment
+        if (assignment.adminId !== req.admin._id.toString()) {
+            return res.status(403).json({ message: 'You are not authorized to reject this assignment.' });
+        }
+
         // Update the assignment status to 'accepted'
-        await Assignment.findByIdAndUpdate(id, { status: 'Rejected' });
+        await Assignment.findByIdAndUpdate(id, { status: 'accepted' });
 
         // Respond with a success message
-        res.status(200).json({ message: 'Assignment Rejected' });
+        res.status(200).json({ message: 'Assignment rejected.' });
     } catch (error) {
-        console.error('Error accepting assignment:', error);
+        console.error('Error rejecting assignment:', error);
         res.status(500).json({ message: 'Failed to reject assignment. Please try again later.' });
     }
 };
+
