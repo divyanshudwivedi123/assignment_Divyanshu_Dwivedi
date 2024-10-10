@@ -154,7 +154,7 @@ exports.acceptAssignment = async (req, res) => {
         }
 
         // Update the assignment status to 'accepted'
-        await Assignment.findByIdAndUpdate(id, { status: 'accepted' });
+        await Assignment.findByIdAndUpdate(id, { status: 'Accepted' });
 
         // Respond with a success message
         res.status(200).json({ message: 'Assignment accepted.' });
@@ -188,7 +188,7 @@ exports.rejectAssignment = async (req, res) => {
         }
 
         // Update the assignment status to 'accepted'
-        await Assignment.findByIdAndUpdate(id, { status: 'accepted' });
+        await Assignment.findByIdAndUpdate(id, { status: 'Rejected' });
 
         // Respond with a success message
         res.status(200).json({ message: 'Assignment rejected.' });
